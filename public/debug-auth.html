@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Debug Authentication</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .button { padding: 10px 20px; margin: 10px; background: #007bff; color: white; border: none; cursor: pointer; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>MoneyMind Debug Authentication</h1>
+
+    <div class="info">
+        <strong>Current tokens:</strong>
+        <div id="current-tokens"></div>
+    </div>
+
+    <button class="button" onclick="setTestToken()">Set Test Token</button>
+    <button class="button" onclick="clearTokens()">Clear Tokens</button>
+    <button class="button" onclick="checkAuthStatus()">Check Auth Status</button>
+    <button class="button" onclick="redirectToApp()">Go to App</button>
+
+    <div id="output"></div>
+
+    <script>
+        const TEST_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJlbWFpbCI6InRlc3RAZXhhbXBsZS5jb20iLCJzZXNzaW9uX2lkIjoxMywiaXNzIjoibW9uZXltaW5kLWJhY2tlbmQiLCJleHAiOjE3NTkxNjI1MTMsIm5iZiI6MTc1OTA3NjExMywiaWF0IjoxNzU5MDc2MTEzfQ.EFunh4jvFXLSiJ2MqjYtUHmKHYabdpG9uwA0X78tI6g';
+        const TEST_REFRESH_TOKEN = 'f5265efd-aea9-4aab-9d18-9324b76e75f8';
+        const TEST_USER = {
+            id: 1,
+            email: 'test@example.com',
+            first_name: 'Test',
+            last_name: 'User',
+            currency: 'USD',
+            timezone: 'UTC'
+        };
+
+        function log(message, type = 'info') {
+            const output = document.getElementById('output');
+            const div = document.createElement('div');
+            div.className = type;
+            div.innerHTML = message;
+            output.appendChild(div);
+        }
+
+        function setTestToken() {
+            localStorage.setItem('access_token', TEST_TOKEN);
+            localStorage.setItem('refresh_token', TEST_REFRESH_TOKEN);
+            localStorage.setItem('user', JSON.stringify(TEST_USER));
+            log('✅ Test tokens set successfully', 'success');
+            updateCurrentTokens();
+        }
+
+        function clearTokens() {
+            localStorage.removeItem('access_token');
+            localStorage.removeItem('refresh_token');
+            localStorage.removeItem('user');
+            log('🗑️ All tokens cleared', 'info');
+            updateCurrentTokens();
+        }
+
+        function checkAuthStatus() {
+            const token = localStorage.getItem('access_token');
+            const user = localStorage.getItem('user');
+
+            if (token && user) {
+                log('✅ User is authenticated', 'success');
+                log('Token: ' + token.substring(0, 50) + '...', 'info');
+                log('User: ' + user, 'info');
+            } else {
+                log('❌ User is not authenticated', 'error');
+            }
+        }
+
+        function updateCurrentTokens() {
+            const token = localStorage.getItem('access_token');
+            const user = localStorage.getItem('user');
+            const currentTokensDiv = document.getElementById('current-tokens');
+
+            if (token && user) {
+                currentTokensDiv.innerHTML = `
+                    <div>Token: ${token.substring(0, 50)}...</div>
+                    <div>User: ${user}</div>
+                `;
+            } else {
+                currentTokensDiv.innerHTML = '<div>No tokens found</div>';
+            }
+        }
+
+        function redirectToApp() {
+            window.location.href = '/';
+        }
+
+        // Initialize
+        updateCurrentTokens();
+        checkAuthStatus();
+    </script>
+</body>
+</html>
